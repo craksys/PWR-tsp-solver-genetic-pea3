@@ -11,7 +11,7 @@ public class Genetic {
     int populationSize = 10;
     int crossRate = 1;
     int mutationRate = 1;
-    int result = 2;
+    int result;
 
 
     public Genetic(Graph graph){
@@ -19,6 +19,7 @@ public class Genetic {
     }
 
     public int apply() {
+        int xd = 0;
         int[][] population, nextPopulation;
         int[] fitness, permutation;
         int tournamentSize = 5;
@@ -27,6 +28,7 @@ public class Genetic {
         population = createFilledDoubleTab(populationSize, graph.size);
         nextPopulation = createFilledDoubleTab(populationSize, graph.size);
         permutation = createFilledTab(graph.size);
+        fitness = createFilledTab(populationSize);
 
         for (int i = 0; i < populationSize; i++) {
             population[i] = generateRandomPath();
@@ -34,8 +36,8 @@ public class Genetic {
 
 
         // Kolejne iteracje algorytmu
-        while (true) {//zegar
-            fitness = createFilledTab(graph.size);
+        while (xd < 1000) {//zegar
+            fitness = createFilledTab(populationSize);
 
             // Ocena jakości osobników
             for(int i =0; i<population.length; i++){
@@ -73,7 +75,7 @@ public class Genetic {
                 } while (p1 == p2); //!(p1 - p2) było
                 */ //dla mnie nie ma sensu ta część
 
-                partiallyCrossover(population[j], population[j+1]);
+                partiallyCrossoverGTP(population[j], population[j+1]);
             }
 
             // Mutacje osobników
@@ -84,12 +86,13 @@ public class Genetic {
                 } while (p1 == p2);
                 swap(p1,p2,population[j]);
             }
+            xd++;
         }
-        result = 2;
+        result = fitness[findIndexOfMinElementFromTab(fitness)];
         return result;
     }
 
-
+/*
     public void partiallyCrossover(int[] parent1, int[] parent2) {
         int[] desc1 = new int[size];
         int[] desc2 = new int[size];
@@ -145,7 +148,7 @@ public class Genetic {
         parent2 = new int[size];
         parent1 = desc1;
         parent2 = desc2;
-    }
+    }*/
     public boolean isInPath(int element, int begin, int end, int[] path) {
         for (int i = begin; i <= end; i++) {
             if (element == path[i])
@@ -180,11 +183,11 @@ public class Genetic {
 
     public int selectLastUnfilled(int[][] tab){
         for(int i = 0; i < tab.length; i++){
-            if(tab[i][1] > 0){
+            if(tab[i][1] == -1){
                 return i;
             }
         }
-        return -1;
+        return -2;
     }
 
     public int[] createFilledTab(int tabSize){
