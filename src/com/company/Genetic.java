@@ -12,7 +12,7 @@ public class Genetic {
     int size;
     int populationSize = 30;
     double crossRate = 0.8;
-    double mutationRate = 0.30;
+    double mutationRate = 0.40;
     int result = Integer.MAX_VALUE;
 
 
@@ -24,7 +24,7 @@ public class Genetic {
         int xd = 0;
         int[][] population, nextPopulation;
         int[] fitness, permutation;
-        int tournamentSize = 5;
+        int tournamentSize = 4;
         int index, p1, p2;
 
         population = createFilledDoubleTab(populationSize, graph.size);
@@ -38,7 +38,7 @@ public class Genetic {
 
 
         // Kolejne iteracje algorytmu
-        while (xd < 100000) {//zegar
+        while (xd < 300000) {//zegar
             fitness = createFilledTab(populationSize);
 
             // Ocena jakości osobników
