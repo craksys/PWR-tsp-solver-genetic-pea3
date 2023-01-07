@@ -8,12 +8,12 @@ public class Genetic {
     Graph graph;
     int populationSize = 30;
     double crossRate = 0.8;
-    double mutationRate = 0.30;
+    double mutationRate = 0.01;
     int bestSolution = Integer.MAX_VALUE;
     int[] bestPath;
     long millisActualTime;
     long executionTime, bestSolutionTime;
-    long timeLimit = 20000;
+    long timeLimit = 30000;
 
 
     public Genetic(Graph graph) {
@@ -23,7 +23,7 @@ public class Genetic {
     public void solve() {
         int[][] population, nextPopulation;
         int[] ratedPopulation, permutation;
-        int tournamentSize = 4;
+        int tournamentSize = 5;
         int index, p1, p2, p3;
 
         population = createFilledDoubleTab(populationSize, graph.size-1);
@@ -64,7 +64,6 @@ public class Genetic {
                     index = rand.nextInt(populationSize);
                     if (ratedPopulation[index] < result) {
                         result = ratedPopulation[index];
-                        //permutation = createFilledTab(graph.size);
                         permutation = population[index].clone();
                     }
                 }
@@ -89,7 +88,7 @@ public class Genetic {
                 do {
                     p1 = rand.nextInt(graph.size-1);
                     p2 = rand.nextInt(graph.size-1);
-                    p3 = rand.nextInt(graph.size-1);
+                    p3 = rand.nextInt(populationSize);
                 } while (p1 == p2);
                 swap(p1, p2, population[p3]);
             }
@@ -186,6 +185,59 @@ public class Genetic {
         return index;
     }
 
+    public int[] myorderCrossover(int[] tab1, int[] tab2) {
+        int startIndex = rand.nextInt(graph.size - 2);
+        int endIndex = rand.nextInt(graph.size - 1);
+        int actualChildIndex = 0;
+        if (startIndex > endIndex) {
+            int helper = endIndex;
+            endIndex = startIndex;
+            startIndex = helper;
+        }
+        int[] child = new int[graph.size-1];
+        Arrays.fill(child, -1);
+
+        for (int i = startIndex; i < endIndex + 1; i++) {
+            child[i] = tab1[i];
+        }
+
+        actualChildIndex = endIndex+1;
+        if(actualChildIndex > tab1.length-1){
+            actualChildIndex =0;
+        }
+
+        for (int i = endIndex; i < tab2.length - 1; i++) {
+            if(!isElementInTab(child, tab2[i])){
+                child[actualChildIndex] = tab2[i];
+                actualChildIndex++;
+            }
+            if(actualChildIndex > tab1.length-1){
+                actualChildIndex = 0;
+            }
+        }
+        for (int i = 0; isElementInTab(child,-1); i++) {
+            if(!isElementInTab(child, tab2[i])){
+                child[actualChildIndex] = tab2[i];
+                actualChildIndex++;
+                if(actualChildIndex > tab1.length-1){
+                    actualChildIndex = 0;
+                }
+            }
+        }
+
+        /*for (int i = (endIndex + 1) % (graph.size-1); i < (endIndex + 1) % (graph.size-1) + (graph.size-1); i++) {
+            int nextNumber = i;
+            if (!isElementInTab(child, -1)) {
+                break;
+            }
+            while (isElementInTab(child, tab2[nextNumber % (graph.size-1)])) {
+                nextNumber++;
+            }
+            child[i % (graph.size-1)] = tab2[nextNumber % (graph.size-1)];
+        }*/
+        return child;
+    }
+
     public int[] orderCrossover(int[] tab1, int[] tab2) {
         int startIndex = rand.nextInt(graph.size - 2);
         int endIndex = rand.nextInt(graph.size-1);
@@ -214,7 +266,6 @@ public class Genetic {
         }
         return child;
     }
-
     public boolean isElementInTab(int[] tab, int element) {
         for (int i : tab) {
             if (i == element) {
@@ -223,5 +274,7 @@ public class Genetic {
         }
         return false;
     }
+
+
 
 }

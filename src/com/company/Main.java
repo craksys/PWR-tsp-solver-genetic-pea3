@@ -52,7 +52,9 @@ public class Main {
                     genetic.mutationRate = mutationRate;
                 }
                 case 6 ->{
-                    genetic.solve();
+                            genetic.bestSolutionTime = Integer.MAX_VALUE;
+                            genetic.bestSolution = Integer.MAX_VALUE;
+                            genetic.solve();
                 }
                 default -> {
                     menu = 0;
