@@ -39,7 +39,7 @@ public class Genetic {
         }
 
         if (ratedPopulation[findIndexOfMinElementFromTab(ratedPopulation)] < bestSolution) {
-            swapTheBest (ratedPopulation, population[findIndexOfMinElementFromTab(ratedPopulation)]);
+            swapTheBest(ratedPopulation, population[findIndexOfMinElementFromTab(ratedPopulation)]);
         }
 
         millisActualTime = System.currentTimeMillis();
@@ -57,7 +57,7 @@ public class Genetic {
                 int result = Integer.MAX_VALUE;
 
 
-                // Wybór najlepszego osobnika z turnieju
+                // Organizacja turnieju
                 for (int k = 0; k < tournamentSize; k++) {
                     index = rand.nextInt(populationSize);
                     if (ratedPopulation[index] < result) {
@@ -68,21 +68,21 @@ public class Genetic {
                 nextPopulation[selectLastUnfilled(nextPopulation)] = permutation.clone();
             }
 
-            // Wymiana pokoleń
+            // Podmiana pokoleń
             population = nextPopulation;
             nextPopulation = createFilledDoubleTab(populationSize, graph.size - 1);
 
 
             int rotate = populationSize - (int) (crossRate * (float) populationSize);
             rotate = rand.nextInt(rotate);
-            // Krzyżowanie osobników
 
+            // Rozpatrywanie krzyżowania
             for (int j = rotate; j < (int) (crossRate * (float) populationSize) + rotate; j += 2) {
                 population[j] = myOrderCrossover(population[j], population[j + 1]);
                 population[j + 1] = myOrderCrossover(population[j + 1], population[j]);
             }
 
-            // Mutacje osobników
+            //Rozpatrywanie mutacji
             for (int j = 0; j < (int) (mutationRate * (float) populationSize) + 1; j++) {
                 do {
                     p1 = rand.nextInt(graph.size - 1);
@@ -99,7 +99,7 @@ public class Genetic {
             if (ratedPopulation[findIndexOfMinElementFromTab(ratedPopulation)] < bestSolution) {
                 swapTheBest(ratedPopulation, population[findIndexOfMinElementFromTab(ratedPopulation)]);
             }
-
+            //warunek stopu
             executionTime = System.currentTimeMillis() - millisActualTime;
             if (executionTime > timeLimit) {
                 System.out.println(bestSolution);
@@ -131,7 +131,7 @@ public class Genetic {
         return cost;
     }
 
-    public int[] generateRandomPath() { //generowanie losowej ścieżki
+    private int[] generateRandomPath() { //generowanie losowej ścieżki
         int[] randomPath = new int[graph.matrix.length - 1];
         for (int i = 0; i < graph.matrix.length - 1; i++) {
             randomPath[i] = i + 1;
@@ -146,7 +146,7 @@ public class Genetic {
         return randomPath;
     }
 
-    public int selectLastUnfilled(int[][] tab) {
+    private int selectLastUnfilled(int[][] tab) {
         for (int i = 0; i < tab.length; i++) {
             if (tab[i][1] == -1) {
                 return i;
@@ -155,13 +155,13 @@ public class Genetic {
         return -2;
     }
 
-    public int[] createFilledTab(int tabSize) {
+    private int[] createFilledTab(int tabSize) {
         int[] tab = new int[tabSize];
         Arrays.fill(tab, -1);
         return tab;
     }
 
-    public int[][] createFilledDoubleTab(int populationSize, int graphSize) {
+    private int[][] createFilledDoubleTab(int populationSize, int graphSize) {
         int[][] tab = new int[populationSize][graphSize];
         for (int i = 0; i < populationSize; i++) {
             tab[i] = createFilledTab(graphSize);
@@ -176,7 +176,7 @@ public class Genetic {
     }
 
 
-    public int findIndexOfMinElementFromTab(int[] tab) {
+    private int findIndexOfMinElementFromTab(int[] tab) {
         int smallest = Integer.MAX_VALUE;
         int index = -1;
         for (int i = 0; i < tab.length; i++) {
@@ -188,10 +188,10 @@ public class Genetic {
         return index;
     }
 
-    public int[] myOrderCrossover(int[] tab1, int[] tab2) {
+    private int[] myOrderCrossover(int[] tab1, int[] tab2) {
         int startIndex = rand.nextInt(graph.size - 2);
         int endIndex = rand.nextInt(graph.size - 1);
-        int actualChildIndex = 0;
+        int actualChildIndex;
         if (startIndex > endIndex) {
             int helper = endIndex;
             endIndex = startIndex;
@@ -230,7 +230,7 @@ public class Genetic {
         return child;
     }
 
-    public int[] orderCrossoverOld(int[] tab1, int[] tab2) {
+    private int[] orderCrossoverOld(int[] tab1, int[] tab2) {
         int startIndex = rand.nextInt(graph.size - 2);
         int endIndex = rand.nextInt(graph.size - 1);
         if (startIndex > endIndex) {
@@ -259,7 +259,7 @@ public class Genetic {
         return child;
     }
 
-    public boolean isElementInTab(int[] tab, int element) {
+    private boolean isElementInTab(int[] tab, int element) {
         for (int i : tab) {
             if (i == element) {
                 return true;
