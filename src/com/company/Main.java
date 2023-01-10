@@ -5,8 +5,9 @@ import java.util.Scanner;
 public class Main {
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
+
     public static void main(String[] args) {
-    Graph graph = new Graph();
+        Graph graph = new Graph();
         Genetic genetic = new Genetic(graph);
         Scanner in = new Scanner(System.in);
         int menu = -1;
@@ -43,7 +44,7 @@ public class Main {
                     }
                     genetic.crossRate = crossRate;
                 }
-                case 5 ->{
+                case 5 -> {
                     System.out.println("Wybierz współczynnik mutacji: ");
                     double mutationRate = in.nextDouble();
                     if (mutationRate > 1 || mutationRate < 0) {
@@ -51,10 +52,10 @@ public class Main {
                     }
                     genetic.mutationRate = mutationRate;
                 }
-                case 6 ->{
-                            genetic.bestSolutionTime = Integer.MAX_VALUE;
-                            genetic.bestSolution = Integer.MAX_VALUE;
-                            genetic.solve();
+                case 6 -> {
+                    genetic.bestSolutionTime = Integer.MAX_VALUE;
+                    genetic.bestSolution = Integer.MAX_VALUE;
+                    genetic.solve();
                 }
                 default -> {
                     menu = 0;
@@ -63,7 +64,6 @@ public class Main {
 
         }
     }
-
 
 
     public static void printOptions() { //drukowanie opcji programu

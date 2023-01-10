@@ -6,9 +6,9 @@ import java.util.Random;
 public class Genetic {
     Random rand = new Random();
     Graph graph;
-    int populationSize = 30;
+    int populationSize = 10;
     double crossRate = 0.8;
-    double mutationRate = 0.01;
+    double mutationRate = 0.20;
     int bestSolution = Integer.MAX_VALUE;
     int[] bestPath;
     long millisActualTime;
@@ -26,9 +26,9 @@ public class Genetic {
         int tournamentSize = 5;
         int index, p1, p2, p3;
 
-        population = createFilledDoubleTab(populationSize, graph.size-1);
-        nextPopulation = createFilledDoubleTab(populationSize, graph.size-1);
-        permutation = createFilledTab(graph.size-1);
+        population = createFilledDoubleTab(populationSize, graph.size - 1);
+        nextPopulation = createFilledDoubleTab(populationSize, graph.size - 1);
+        permutation = createFilledTab(graph.size - 1);
 
         for (int i = 0; i < populationSize; i++) {
             population[i] = generateRandomPath();
@@ -39,17 +39,15 @@ public class Genetic {
         }
 
         if (ratedPopulation[findIndexOfMinElementFromTab(ratedPopulation)] < bestSolution) {
-            bestSolutionTime = System.currentTimeMillis() - millisActualTime;
-            bestSolution = ratedPopulation[findIndexOfMinElementFromTab(ratedPopulation)];
-            bestPath = population[findIndexOfMinElementFromTab(ratedPopulation)].clone();
+            swapTheBest (ratedPopulation, population[findIndexOfMinElementFromTab(ratedPopulation)]);
         }
 
         millisActualTime = System.currentTimeMillis();
-        // Kolejne iteracje algorytmu
+
         while (true) {//zegar
             ratedPopulation = createFilledTab(populationSize);
 
-            // Ocena jakości osobników
+            // wpisanie do tablicy i ocena ścieżek
             for (int i = 0; i < population.length; i++) {
                 ratedPopulation[i] = calculatePathCost(population[i]);
             }
@@ -72,22 +70,23 @@ public class Genetic {
 
             // Wymiana pokoleń
             population = nextPopulation;
-            nextPopulation = createFilledDoubleTab(populationSize, graph.size-1);//nextPopulation = new int[populationSize][graph.size];
+            nextPopulation = createFilledDoubleTab(populationSize, graph.size - 1);
 
 
             int rotate = populationSize - (int) (crossRate * (float) populationSize);
             rotate = rand.nextInt(rotate);
             // Krzyżowanie osobników
-            for (int j = rotate; j < (int) (crossRate * (float) populationSize) + rotate; j += 2) { //do poprawy
-                population[j] = orderCrossover(population[j], population[j + 1]);
-                population[j + 1] = orderCrossover(population[j + 1], population[j]);
+
+            for (int j = rotate; j < (int) (crossRate * (float) populationSize) + rotate; j += 2) {
+                population[j] = myOrderCrossover(population[j], population[j + 1]);
+                population[j + 1] = myOrderCrossover(population[j + 1], population[j]);
             }
 
             // Mutacje osobników
             for (int j = 0; j < (int) (mutationRate * (float) populationSize) + 1; j++) {
                 do {
-                    p1 = rand.nextInt(graph.size-1);
-                    p2 = rand.nextInt(graph.size-1);
+                    p1 = rand.nextInt(graph.size - 1);
+                    p2 = rand.nextInt(graph.size - 1);
                     p3 = rand.nextInt(populationSize);
                 } while (p1 == p2);
                 swap(p1, p2, population[p3]);
@@ -98,9 +97,7 @@ public class Genetic {
             }
 
             if (ratedPopulation[findIndexOfMinElementFromTab(ratedPopulation)] < bestSolution) {
-                bestSolutionTime = System.currentTimeMillis() - millisActualTime;
-                bestSolution = ratedPopulation[findIndexOfMinElementFromTab(ratedPopulation)];
-                bestPath = population[findIndexOfMinElementFromTab(ratedPopulation)].clone();
+                swapTheBest(ratedPopulation, population[findIndexOfMinElementFromTab(ratedPopulation)]);
             }
 
             executionTime = System.currentTimeMillis() - millisActualTime;
@@ -117,6 +114,12 @@ public class Genetic {
         }
     }
 
+    private void swapTheBest(int[] ratedPopulation, int[] ints) {
+        bestSolutionTime = System.currentTimeMillis() - millisActualTime;
+        bestSolution = ratedPopulation[findIndexOfMinElementFromTab(ratedPopulation)];
+        bestPath = ints.clone();
+    }
+
 
     private int calculatePathCost(int[] path) {
         int cost = 0;
@@ -129,9 +132,9 @@ public class Genetic {
     }
 
     public int[] generateRandomPath() { //generowanie losowej ścieżki
-        int[] randomPath = new int[graph.matrix.length-1];
-        for (int i = 0; i < graph.matrix.length-1; i++) {
-            randomPath[i] = i+1;
+        int[] randomPath = new int[graph.matrix.length - 1];
+        for (int i = 0; i < graph.matrix.length - 1; i++) {
+            randomPath[i] = i + 1;
         }
         for (int i = 0; i < randomPath.length; i++) {//funkcja losująca kolejność
             int randomIndexToSwap = rand.nextInt(randomPath.length);//wszystkie oprocz 0
@@ -185,7 +188,7 @@ public class Genetic {
         return index;
     }
 
-    public int[] myorderCrossover(int[] tab1, int[] tab2) {
+    public int[] myOrderCrossover(int[] tab1, int[] tab2) {
         int startIndex = rand.nextInt(graph.size - 2);
         int endIndex = rand.nextInt(graph.size - 1);
         int actualChildIndex = 0;
@@ -194,59 +197,48 @@ public class Genetic {
             endIndex = startIndex;
             startIndex = helper;
         }
-        int[] child = new int[graph.size-1];
+        int[] child = new int[graph.size - 1];
         Arrays.fill(child, -1);
 
         for (int i = startIndex; i < endIndex + 1; i++) {
             child[i] = tab1[i];
         }
 
-        actualChildIndex = endIndex+1;
-        if(actualChildIndex > tab1.length-1){
-            actualChildIndex =0;
+        actualChildIndex = endIndex + 1;
+        if (actualChildIndex > tab1.length - 1) {
+            actualChildIndex = 0;
         }
 
-        for (int i = endIndex; i < tab2.length - 1; i++) {
-            if(!isElementInTab(child, tab2[i])){
+        for (int i = endIndex + 1; i < tab2.length; i++) {
+            if (!isElementInTab(child, tab2[i])) {
                 child[actualChildIndex] = tab2[i];
                 actualChildIndex++;
             }
-            if(actualChildIndex > tab1.length-1){
+            if (actualChildIndex > tab1.length - 1) {
                 actualChildIndex = 0;
             }
         }
-        for (int i = 0; isElementInTab(child,-1); i++) {
-            if(!isElementInTab(child, tab2[i])){
+        for (int i = 0; isElementInTab(child, -1); i++) {
+            if (!isElementInTab(child, tab2[i])) {
                 child[actualChildIndex] = tab2[i];
                 actualChildIndex++;
-                if(actualChildIndex > tab1.length-1){
+                if (actualChildIndex > tab1.length - 1) {
                     actualChildIndex = 0;
                 }
             }
         }
-
-        /*for (int i = (endIndex + 1) % (graph.size-1); i < (endIndex + 1) % (graph.size-1) + (graph.size-1); i++) {
-            int nextNumber = i;
-            if (!isElementInTab(child, -1)) {
-                break;
-            }
-            while (isElementInTab(child, tab2[nextNumber % (graph.size-1)])) {
-                nextNumber++;
-            }
-            child[i % (graph.size-1)] = tab2[nextNumber % (graph.size-1)];
-        }*/
         return child;
     }
 
-    public int[] orderCrossover(int[] tab1, int[] tab2) {
+    public int[] orderCrossoverOld(int[] tab1, int[] tab2) {
         int startIndex = rand.nextInt(graph.size - 2);
-        int endIndex = rand.nextInt(graph.size-1);
+        int endIndex = rand.nextInt(graph.size - 1);
         if (startIndex > endIndex) {
             int helper = endIndex;
             endIndex = startIndex;
             startIndex = helper;
         }
-        int[] child = new int[graph.size-1];
+        int[] child = new int[graph.size - 1];
         Arrays.fill(child, -1);
 
         for (int i = startIndex; i < endIndex + 1; i++) {
@@ -254,18 +246,19 @@ public class Genetic {
         }
 
 
-        for (int i = (endIndex + 1) % (graph.size-1); i < (endIndex + 1) % (graph.size-1) + (graph.size-1); i++) {
+        for (int i = (endIndex + 1) % (graph.size - 1); i < (endIndex + 1) % (graph.size - 1) + (graph.size - 1); i++) {
             int nextNumber = i;
             if (!isElementInTab(child, -1)) {
                 break;
             }
-            while (isElementInTab(child, tab2[nextNumber % (graph.size-1)])) {
+            while (isElementInTab(child, tab2[nextNumber % (graph.size - 1)])) {
                 nextNumber++;
             }
-            child[i % (graph.size-1)] = tab2[nextNumber % (graph.size-1)];
+            child[i % (graph.size - 1)] = tab2[nextNumber % (graph.size - 1)];
         }
         return child;
     }
+
     public boolean isElementInTab(int[] tab, int element) {
         for (int i : tab) {
             if (i == element) {
@@ -274,7 +267,5 @@ public class Genetic {
         }
         return false;
     }
-
-
 
 }
