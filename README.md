@@ -2,7 +2,7 @@
 Prowadzący: J.M. (Projektowanie Efektywnych Algorytmów PEA 3)
 
 Użyte algorytmy:
-- Algorytm genetyczny z 3 rodzajami sąsiedztwa (swap, insert, reverse)
+- Algorytm genetyczny
 
 Dostępne funkcje:
 - wczytywanie z dedykowanego przez prowadzącego pliku (.atsp)
@@ -15,7 +15,6 @@ Dostępne funkcje:
 Screen z aplikacji:
 
 ![obraz](https://github.com/craksys/PEA3/assets/53128417/67e4f2ce-179e-41c5-9d56-8e76cf7e5b7c)
-
 
 Installation guide:
 
